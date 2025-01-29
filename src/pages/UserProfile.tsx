@@ -100,6 +100,8 @@ export default function UserProfile(): JSX.Element {
     }
   });
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     if (user) {
@@ -159,54 +161,30 @@ export default function UserProfile(): JSX.Element {
     setLoading(true);
 
     try {
-      // Convert measurements based on selected units
-      const heightInCm = formData.heightUnit === 'cm' 
-        ? parseFloat(formData.height)
-        : formData.heightUnit === 'm' 
-          ? parseFloat(formData.height) * 100
-          : parseFloat(formData.height) * 30.48; // Convert feet to cm
-
-      const weightInKg = formData.weightUnit === 'kg'
-        ? parseFloat(formData.weight)
-        : parseFloat(formData.weight) * 0.453592; // Convert pounds to kg
-
-      // Create the profile object with required fields first
-      const profileData = {
-        id: user.id,
-        full_name: formData.fullName,
-        gender: formData.gender,
-        age: parseInt(formData.age),
-        height: heightInCm,
-        weight: weightInKg,
-        updated_at: new Date().toISOString(),
-        posture_assessment: formData.postureAssessment
-      };
-
-      // Try to update with all fields first
-      let { error } = await supabase
+      const { error } = await supabase
         .from('profiles')
         .upsert({
-          ...profileData,
-          height_unit: 'cm',
-          weight_unit: 'kg',
+          id: user?.id,
+          full_name: formData.fullName,
+          gender: formData.gender,
+          age: formData.age ? parseInt(formData.age) : null,
+          height: formData.height ? parseFloat(formData.height) : null,
+          height_unit: formData.heightUnit,
+          weight: formData.weight ? parseFloat(formData.weight) : null,
+          weight_unit: formData.weightUnit,
           fitness_level: formData.fitnessLevel,
-          goals: formData.goals
-        });
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
 
-      // If we get a column not found error, try updating with just the basic fields
-      if (error && error.code === 'PGRST204') {
-        const { error: basicError } = await supabase
-          .from('profiles')
-          .upsert(profileData);
-        
-        if (basicError) throw basicError;
-      } else if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       setIsProfileComplete(true);
+      setMessage('Profile updated successfully!');
+      setMessageType('success');
     } catch (error) {
       console.error('Error saving profile:', error);
+      setMessage('Error updating profile. Please try again.');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
