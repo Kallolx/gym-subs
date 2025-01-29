@@ -918,6 +918,13 @@ export default function UserProfile(): JSX.Element {
 
             {/* Onboarding Steps */}
             <div className="px-4">
+              {message && (
+                <div className={`mb-4 p-4 rounded-lg ${
+                  messageType === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                }`}>
+                  {message}
+                </div>
+              )}
               {renderStep(steps[currentStep - 1])}
             </div>
           </>

@@ -9,6 +9,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -24,8 +25,12 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      await signUp(email, password);
-      navigate('/profile');
+      const { confirmation } = await signUp(email, password);
+      if (confirmation) {
+        setSuccessMessage('A verification link has been sent to your email address. Please check your inbox to verify your account.');
+      } else {
+        navigate('/profile');
+      }
     } catch (error) {
       setError('Failed to create an account. Please try again.');
     } finally {
@@ -59,6 +64,16 @@ export default function SignUp() {
                 className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6"
               >
                 <p className="text-red-400 text-sm">{error}</p>
+              </motion.div>
+            )}
+            
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-6"
+              >
+                <p className="text-green-400 text-sm">{successMessage}</p>
               </motion.div>
             )}
 
