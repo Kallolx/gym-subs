@@ -33,11 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    const site_url = import.meta.env.PROD 
+      ? 'https://fitposture.vercel.app' 
+      : window.location.origin;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin + '/signin'
+        emailRedirectTo: `${site_url}/signin`
       }
     });
     if (error) throw error;
