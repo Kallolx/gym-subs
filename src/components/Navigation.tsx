@@ -89,29 +89,29 @@ export default function Navigation() {
           {/* Mobile menu */}
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 px-4 pb-4 pt-2 backdrop-blur-md bg-gray-900/95">
-              {navigation.map((item) => (
+                        {navigation.map((item) => (
                 <Disclosure.Button
-                  key={item.name}
+                            key={item.name}
                   as={Link}
-                  to={item.href}
+                            to={item.href}
                   className="block text-gray-200 hover:text-red-400 px-3 py-2 text-base font-medium transition-colors duration-200"
-                >
-                  {item.name}
+                          >
+                            {item.name}
                 </Disclosure.Button>
-              ))}
+                        ))}
               <div className="mt-4 space-y-2">
                 <Disclosure.Button
                   as={Link}
-                  to="/signin"
+                              to="/signin"
                   className="block w-full text-left text-gray-200 hover:text-red-400 px-3 py-2 text-base font-medium transition-colors duration-200"
-                >
+                            >
                   Sign in
                 </Disclosure.Button>
                 <Disclosure.Button
                   as={Link}
-                  to="/signup"
+                              to="/signup"
                   className="block w-full bg-gradient-to-r from-red-500 to-purple-600 text-white px-4 py-2 rounded-lg text-base font-medium hover:from-red-600 hover:to-purple-700 transition-all duration-200"
-                >
+                            >
                   Get Started
                 </Disclosure.Button>
               </div>

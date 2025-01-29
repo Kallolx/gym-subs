@@ -6,7 +6,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<{ confirmation: boolean }>;
+  signUp: (email: string, password: string) => Promise<{ confirmation: boolean | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -55,6 +55,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Please check your email for the confirmation link before signing in.');
       }
       throw error;
+    }
+
+    // Check if profile exists, if not create one
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .select()
+      .eq('id', (await supabase.auth.getUser()).data.user?.id)
+      .single();
+
+    if (profileError?.code === 'PGRST116') {
+      const { error: createError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: (await supabase.auth.getUser()).data.user?.id,
+            full_name: email.split('@')[0],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
+        .select()
+        .single();
+
+      if (createError) throw createError;
     }
   };
 
